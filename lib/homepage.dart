@@ -4,11 +4,9 @@ import 'package:bookapp/utils/helperclass.dart';
 import 'package:bookapp/utils/initializerclass.dart';
 import 'package:bookapp/utils/miscclass.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -25,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   DateTime? currentBackPressTime;
   @override
   void initState() {
-    FlutterNativeSplash.remove();
+   
     context.read<MainBloc>().add(FetchBookData());
     super.initState();
   }
@@ -38,98 +36,241 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             title: const Text('ScaleX Book Library'),
           ),
-          body: DoubleBackToCloseApp(
-            snackBar: const SnackBar(
-              content: Text('Tap back again to leave'),
-            ),
-            child: Column(
-              children: [
-                Helper.allowHeight(10),
-                Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        searchBar(),
-                        searchResultsCount(),
-                      ],
-                    )),
-                BlocBuilder<MainBloc, MainState>(
-                  buildWhen: (previous, current) =>
-                      current is LoadingBookData ||
-                      current is BookDataFetched ||
-                      current is BookDataNotFound ||
-                      current is BookDataNotFetched ||
-                      current is SearhcingBooks ||
-                      current is BooksFound ||
-                      current is BooksNotFound ||
-                      current is NoSearch ||
-                      current is SearhcingBooksFailed,
-                  builder: (context, state) => state is SearhcingBooks
-                      ? Helper.showWaiting()
-                      : state is BooksFound
-                          ? Expanded(
-                              child: Scrollbar(
-                                thumbVisibility: true,
-                                child: ListView.separated(
-                                    padding: const EdgeInsets.all(14.0),
-                                    shrinkWrap: true,
-                                    itemBuilder: (context, index) =>
-                                        searchListView(index),
-                                    separatorBuilder: (context, index) =>
-                                        Helper.allowHeight(15),
-                                    itemCount: Initializer
-                                        .bookSearchModel!.docs!.length),
-                              ),
-                            )
-                          : state is BooksNotFound
-                              ? Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Helper.allowHeight(Helper.height / 12),
-                                    const Icon(Icons.menu_book_rounded,
-                                        size: 90, color: Colors.grey),
-                                    Helper.allowHeight(10),
-                                    const Text("No results found",
-                                        textAlign: TextAlign.center),
-                                  ],
-                                )
-                              : state is LoadingBookData &&
-                                      Misc.isEmpty(Initializer
-                                          .bookDataModel!.readingLogEntries)
-                                  ? Helper.showWaiting()
-                                  : state is BookDataFetched ||
-                                          state is NoSearch ||
-                                          !Misc.isEmpty(Initializer
-                                              .bookDataModel!.readingLogEntries)
-                                      ? Expanded(
-                                          child: Scrollbar(
-                                            thumbVisibility: true,
-                                            child: ListView.separated(
-                                                padding:
-                                                    const EdgeInsets.all(14.0),
-                                                shrinkWrap: true,
-                                                itemBuilder: (context, index) =>
-                                                    allBooksView(index),
-                                                separatorBuilder:
-                                                    (context, index) =>
-                                                        Helper.allowHeight(15),
-                                                itemCount: Initializer
-                                                    .bookDataModel!
-                                                    .readingLogEntries!
-                                                    .length),
+          body: Column(
+            children: [
+              Helper.allowHeight(10),
+              Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      searchBar(),
+                      searchResultsCount(),
+                    ],
+                  )),
+              BlocBuilder<MainBloc, MainState>(
+                buildWhen: (previous, current) =>
+                    current is LoadingBookData ||
+                    current is BookDataFetched ||
+                    current is BookDataNotFound ||
+                    current is BookDataNotFetched ||
+                    current is SearhcingBooks ||
+                    current is BooksFound ||
+                    current is BooksNotFound ||
+                    current is NoSearch ||
+                    current is SearhcingBooksFailed,
+                builder: (context, state) => state is SearhcingBooks
+                    ? Helper.showWaiting()
+                    : state is BooksFound
+                        ? Expanded(
+                            child: Scrollbar(
+                              thumbVisibility: true,
+                              child: ListView.separated(
+                                  padding: const EdgeInsets.all(14.0),
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, index) =>
+                                      searchListView(index),
+                                  separatorBuilder: (context, index) =>
+                                      Helper.allowHeight(15),
+                                  itemCount: Initializer
+                                      .bookSearchModel!.docs!.length),
+                            ),
+                          )
+                        : state is BooksNotFound
+                            ? Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Helper.allowHeight(Helper.height / 12),
+                                  const Icon(Icons.menu_book_rounded,
+                                      size: 90, color: Colors.grey),
+                                  Helper.allowHeight(10),
+                                  const Text("No results found",
+                                      textAlign: TextAlign.center),
+                                ],
+                              )
+                            : state is LoadingBookData &&
+                                    Misc.isEmpty(Initializer
+                                        .bookDataModel!.readingLogEntries)
+                                ? Helper.showWaiting()
+                                : state is BookDataFetched ||
+                                        state is NoSearch ||
+                                        !Misc.isEmpty(Initializer
+                                            .bookDataModel!.readingLogEntries)
+                                    ? Expanded(
+                                        child: Scrollbar(
+                                          thumbVisibility: true,
+                                          child: ListView.separated(
+                                              padding:
+                                                  const EdgeInsets.all(14.0),
+                                              shrinkWrap: true,
+                                              itemBuilder:
+                                                  (context, index) =>
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(14),
+                                                        width: Helper.width,
+                                                        height:
+                                                            Helper.height / 4,
+                                                        clipBehavior:
+                                                            Clip.hardEdge,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white,
+                                                          boxShadow: const <BoxShadow>[
+                                                            BoxShadow(
+                                                              color:
+                                                                  Colors.grey,
+                                                              spreadRadius:
+                                                                  0.2,
+                                                              blurRadius: 2,
+                                                            )
+                                                          ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      4),
+                                                        ),
+                                                        child: Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius:
+                                                                  const BorderRadius
+                                                                      .all(
+                                                                      Radius.circular(
+                                                                          8.0)),
+                                                              child: CachedNetworkImage(
+                                                                  errorWidget: (context,
+                                                                          url,
+                                                                          error) =>
+                                                                      const Center(
+                                                                          child: Icon(Icons
+                                                                              .error)),
+                                                                  progressIndicatorBuilder: (context,
+                                                                          url,
+                                                                          progress) =>
+                                                                      const Center(
+                                                                          child:
+                                                                              CupertinoActivityIndicator()),
+                                                                  width: Helper
+                                                                          .width /
+                                                                      3,
+                                                                  fit: BoxFit
+                                                                      .contain,
+                                                                  imageUrl:
+                                                                      'https://covers.openlibrary.org/b/id/${Initializer.bookDataModel!.readingLogEntries![index].work!.coverId}-M.jpg'),
+                                                            ),
+                                                            Helper.allowWidth(
+                                                                10),
+                                                            Expanded(
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .max,
+                                                                children: [
+                                                                  Expanded(
+                                                                    child:
+                                                                        Column(
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment.start,
+                                                                      mainAxisSize:
+                                                                          MainAxisSize.max,
+                                                                      children: [
+                                                                        Text(
+                                                                          Initializer.bookDataModel!.readingLogEntries![index].work!.title!,
+                                                                          style:
+                                                                              const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                          maxLines:
+                                                                              3,
+                                                                        ),
+                                                                        Helper.allowHeight(
+                                                                            5),
+                                                                        Text(
+                                                                            getAuthorNames(Initializer.bookDataModel!.readingLogEntries![index].work!.authorNames!),
+                                                                            overflow: TextOverflow.ellipsis,
+                                                                            maxLines: 2),
+                                                                        Helper.allowHeight(
+                                                                            5),
+                                                                        Text(
+                                                                            // "Published - ${Helper.setDateFormat(dateTime: DateTime.parse(Initializer.bookDataModel!.readingLogEntries![index].loggedDate!))}"),
+                                                                            "Published year - ${Initializer.bookDataModel!.readingLogEntries![index].work!.firstPublishYear}")
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  Consumer<
+                                                                      Changer>(
+                                                                    builder: (context,
+                                                                            value,
+                                                                            child) =>
+                                                                        MaterialButton(
+                                                                      shape: RoundedRectangleBorder(
+                                                                          side:
+                                                                              BorderSide(color: Initializer.bookDataModel!.readingLogEntries![index].work!.isRead! ? Colors.black : Colors.transparent),
+                                                                          borderRadius: BorderRadius.circular(30.0)),
+                                                                      color: Initializer.bookDataModel!.readingLogEntries![index].work!.isRead!
+                                                                          ? Colors.white
+                                                                          : Colors.green,
+                                                                      minWidth:
+                                                                          Helper.width,
+                                                                      onPressed:
+                                                                          () async {
+                                                                        Initializer.bookDataModel!.readingLogEntries![index].work!.isRead!
+                                                                            ? Initializer.bookDataModel!.readingLogEntries![index].work!.isRead = false
+                                                                            : Initializer.bookDataModel!.readingLogEntries![index].work!.isRead = true;
+                                                                        context
+                                                                            .read<Changer>()
+                                                                            .justChange();
+                                                                        await Helper
+                                                                            .showInfo();
+                                                                      },
+                                                                      child:
+                                                                          Text(
+                                                                        Initializer.bookDataModel!.readingLogEntries![index].work!.isRead!
+                                                                            ? "Unread"
+                                                                            : "Read",
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color: Initializer.bookDataModel!.readingLogEntries![index].work!.isRead!
+                                                                              ? Colors.black
+                                                                              : Colors.white,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                              separatorBuilder:
+                                                  (context, index) =>
+                                                      Helper.allowHeight(15),
+                                              itemCount: Initializer
+                                                  .bookDataModel!
+                                                  .readingLogEntries!
+                                                  .length),
+                                        ),
+                                      )
+                                    : state is BookDataNotFound
+                                        ? const Center(
+                                            child: Text("No data found"),
+                                          )
+                                        : const Center(
+                                            child:
+                                                Text('Something went wrong'),
                                           ),
-                                        )
-                                      : state is BookDataNotFound
-                                          ? const Center(
-                                              child: Text("No data found"),
-                                            )
-                                          : const Center(
-                                              child:
-                                                  Text('Something went wrong'),
-                                            ),
-                ),
-              ],
-            ),
+              ),
+            ],
           )),
     );
   }
@@ -295,115 +436,6 @@ class _HomePageState extends State<HomePage> {
                               Initializer.bookSearchModel!.docs![index].isRead!
                                   ? Colors.black
                                   : Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-
-  Widget allBooksView(int index) => Container(
-        padding: const EdgeInsets.all(14),
-        width: Helper.width,
-        height: Helper.height / 4,
-        clipBehavior: Clip.hardEdge,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: const <BoxShadow>[
-            BoxShadow(
-              color: Colors.grey,
-              spreadRadius: 0.2,
-              blurRadius: 2,
-            )
-          ],
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-              child: CachedNetworkImage(
-                  errorWidget: (context, url, error) =>
-                      const Center(child: Icon(Icons.error)),
-                  progressIndicatorBuilder: (context, url, progress) =>
-                      const Center(child: CupertinoActivityIndicator()),
-                  width: Helper.width / 3,
-                  fit: BoxFit.contain,
-                  imageUrl:
-                      'https://covers.openlibrary.org/b/id/${Initializer.bookDataModel!.readingLogEntries![index].work!.coverId}-M.jpg'),
-            ),
-            Helper.allowWidth(10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Text(
-                          Initializer.bookDataModel!.readingLogEntries![index]
-                              .work!.title!,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 3,
-                        ),
-                        Helper.allowHeight(5),
-                        Text(
-                            getAuthorNames(Initializer.bookDataModel!
-                                .readingLogEntries![index].work!.authorNames!),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2),
-                        Helper.allowHeight(5),
-                        Text(
-                            // "Published - ${Helper.setDateFormat(dateTime: DateTime.parse(Initializer.bookDataModel!.readingLogEntries![index].loggedDate!))}"),
-                            "Published year - ${Initializer.bookDataModel!.readingLogEntries![index].work!.firstPublishYear}")
-                      ],
-                    ),
-                  ),
-                  Consumer<Changer>(
-                    builder: (context, value, child) => MaterialButton(
-                      shape: RoundedRectangleBorder(
-                          side: BorderSide(
-                              color: Initializer.bookDataModel!
-                                      .readingLogEntries![index].work!.isRead!
-                                  ? Colors.black
-                                  : Colors.transparent),
-                          borderRadius: BorderRadius.circular(30.0)),
-                      color: Initializer.bookDataModel!
-                              .readingLogEntries![index].work!.isRead!
-                          ? Colors.white
-                          : Colors.green,
-                      minWidth: Helper.width,
-                      onPressed: () async {
-                        Initializer.bookDataModel!.readingLogEntries![index]
-                                .work!.isRead!
-                            ? Initializer.bookDataModel!
-                                .readingLogEntries![index].work!.isRead = false
-                            : Initializer.bookDataModel!
-                                .readingLogEntries![index].work!.isRead = true;
-                        context.read<Changer>().justChange();
-                        await Helper.showInfo();
-                      },
-                      child: Text(
-                        Initializer.bookDataModel!.readingLogEntries![index]
-                                .work!.isRead!
-                            ? "Unread"
-                            : "Read",
-                        style: TextStyle(
-                          color: Initializer.bookDataModel!
-                                  .readingLogEntries![index].work!.isRead!
-                              ? Colors.black
-                              : Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
